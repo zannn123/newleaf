@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "newleaf",
+  "description": "newleaf: fresh Claude Code sessions that keep the thread.",
+  "owner": {
+    "name": "DjMhel",
+    "url": "https://github.com/zannn123"
+  },
+  "plugins": [
+    {
+      "name": "newleaf",
+      "description": "One-call handoff note + auto-load into the next session + a guard for costly chats. Measured: 86% fewer tokens per task.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
