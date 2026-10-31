@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 600" width="1280" height="600" role="img" aria-labelledby="flow-title flow-desc">
+  <title id="flow-title">How newleaf works</title>
+  <desc id="flow-desc">A loop of four steps: work, type /newleaf to write the handoff note in one reply, /clear, and a fresh session that starts with the note and the lean rules. A guard says when a chat has grown to twice its start.</desc>
+  <style>
+    .bg { fill: #F6FAF4; }
+    .card { fill: #FFFFFF; stroke: #DCE8DD; stroke-width: 1.5; }
+    .card-hot { fill: #FFFFFF; stroke: #16A34A; stroke-width: 2; }
+    .ink { fill: #0F1A12; }
+    .muted { fill: #536657; }
+    .accent { fill: #16A34A; }
+    .on-accent { fill: #FFFFFF; }
+    .pill { fill: #E4F6E9; }
+    .wire { stroke: #16A34A; stroke-width: 2.5; fill: none; }
+    .wire-soft { stroke: #9DBBA4; stroke-width: 2; fill: none; stroke-dasharray: 6 7; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0B110D; }
+      .card { fill: #111A14; stroke: #223326; }
+      .card-hot { fill: #111A14; stroke: #4ADE80; }
+      .ink { fill: #ECF7EF; }
+      .muted { fill: #94A89A; }
+      .accent { fill: #4ADE80; }
+      .on-accent { fill: #0B110D; }
+      .pill { fill: #153A24; }
+      .wire { stroke: #4ADE80; }
+      .wire-soft { stroke: #3F5A47; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" class="accent"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1280" height="600" rx="28"/>
+
+  <!-- the guard, watching step 1 -->
+  <rect class="pill" x="40" y="44" width="560" height="44" rx="22"/>
+  <circle class="accent" cx="66" cy="66" r="7"/>
+  <text x="84" y="73" font-size="19" class="ink"><tspan font-weight="700">guard</tspan>  speaks when a step re-sends 2× the chat's start</text>
+  <path class="wire-soft" d="M170 88 L170 128"/>
+
+  <!-- 1 work -->
+  <rect class="card" x="40" y="132" width="262" height="250" rx="20"/>
+  <circle class="accent" cx="82" cy="176" r="20"/>
+  <text x="82" y="183" font-size="20" font-weight="700" text-anchor="middle" class="on-accent">1</text>
+  <text x="116" y="185" font-size="27" font-weight="700" class="ink">Work</text>
+  <text x="62" y="240" font-size="18" class="muted">Your chat grows, and</text>
+  <text x="62" y="266" font-size="18" class="muted">every step re-sends</text>
+  <text x="62" y="292" font-size="18" class="muted">all of it.</text>
+
+  <!-- 2 /newleaf -->
+  <rect class="card-hot" x="352" y="132" width="262" height="250" rx="20"/>
+  <circle class="accent" cx="394" cy="176" r="20"/>
+  <text x="394" y="183" font-size="20" font-weight="700" text-anchor="middle" class="on-accent">2</text>
+  <text x="428" y="185" font-size="27" font-weight="700" class="ink mono">/newleaf</text>
+  <text x="374" y="240" font-size="18" class="muted">One reply writes the</text>
+  <text x="374" y="266" font-size="18" class="muted">note: rules, decisions,</text>
+  <text x="374" y="292" font-size="18" class="muted">state, next step.</text>
+  <rect class="pill" x="374" y="320" width="146" height="36" rx="18"/>
+  <text x="447" y="344" font-size="16" font-weight="700" text-anchor="middle" class="accent">1 call</text>
+
+  <!-- 3 /clear -->
+  <rect class="card" x="664" y="132" width="262" height="250" rx="20"/>
+  <circle class="accent" cx="706" cy="176" r="20"/>
+  <text x="706" y="183" font-size="20" font-weight="700" text-anchor="middle" class="on-accent">3</text>
+  <text x="740" y="185" font-size="27" font-weight="700" class="ink mono">/clear</text>
+  <text x="686" y="240" font-size="18" class="muted">The big history goes.</text>
+  <text x="686" y="266" font-size="18" class="muted">The note stays in</text>
+  <text x="686" y="292" font-size="16" class="muted mono">.newleaf/handoff.md</text>
+
+  <!-- 4 fresh start -->
+  <rect class="card" x="976" y="132" width="262" height="250" rx="20"/>
+  <circle class="accent" cx="1018" cy="176" r="20"/>
+  <text x="1018" y="183" font-size="20" font-weight="700" text-anchor="middle" class="on-accent">4</text>
+  <text x="1052" y="185" font-size="27" font-weight="700" class="ink">Fresh start</text>
+  <text x="998" y="240" font-size="18" class="muted">The new session opens</text>
+  <text x="998" y="266" font-size="18" class="muted">with the note and the</text>
+  <text x="998" y="292" font-size="18" class="muted">lean working rules.</text>
+
+  <!-- arrows between the steps -->
+  <path class="wire" d="M306 257 L346 257" marker-end="url(#arrow)"/>
+  <path class="wire" d="M618 257 L658 257" marker-end="url(#arrow)"/>
+  <path class="wire" d="M930 257 L970 257" marker-end="url(#arrow)"/>
+
+  <!-- back around: same thread, small again -->
+  <path class="wire" d="M1107 386 L1107 470 Q1107 500 1077 500 L201 500 Q171 500 171 470 L171 392" marker-end="url(#arrow)"/>
+  <rect class="bg" x="430" y="482" width="420" height="36"/>
+  <text x="640" y="507" font-size="19" font-weight="600" text-anchor="middle" class="ink">same thread, small again</text>
+  <text x="640" y="560" font-size="16" text-anchor="middle" class="muted">The start hook loads the note on every new session, /clear and compaction. Nothing to configure.</text>
+</svg>
