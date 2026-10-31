@@ -1,0 +1,20 @@
+run,group,version,date,model,calls,fresh_input,cache_write,cache_read,output,total_tokens,context_first,context_median,context_max,quality,failed_checks
+control-1,"fresh session, no plugin",baseline,2026-10-31,claude-opus-5-5,21,42,49137,1128604,8728,1186511,38855,57457,65699,pass,
+handoff-1,"handoff, 4-step prototype",prototype,2026-10-31,claude-opus-5-5,5,10,414826,1803926,3028,2221790,440957,444043,446032,fail,note not saved: Claude Code blocks writes under .claude/
+handoff-2,"handoff, 4-step prototype",prototype,2026-10-31,claude-opus-5-5,4,8,6642,1769795,4736,1781181,440957,443944,447599,fail,note not saved: Claude Code blocks writes under .claude/
+before-1,resumed session,baseline,2026-10-31,claude-opus-5-5,14,28,422361,5862050,10904,6295343,440208,448760,457385,pass,
+before-2,resumed session,baseline,2026-10-31,claude-opus-5-5,12,24,15501,5348385,6947,5370857,440179,445534,453834,pass,
+control-2,"fresh session, no plugin",baseline,2026-10-31,claude-opus-5-5,15,30,41239,804599,8120,853988,41161,61193,65342,pass,
+control-3,"fresh session, no plugin",baseline,2026-10-31,claude-opus-5-5,15,30,17604,757655,7727,783016,41161,51737,58765,pass,
+handoff-3,"handoff, 4-step prototype",prototype,2026-10-31,claude-opus-5-5,4,8,410921,1363748,2465,1777142,440983,443874,445945,pass,
+after-v0-1,fresh + handoff note,prototype,2026-10-31,claude-opus-5-5,22,44,50916,1182072,10644,1243676,42695,52900,75019,pass,
+after-v0-2,fresh + handoff note,prototype,2026-10-31,claude-opus-5-5,18,36,41787,951145,9612,1002580,40389,55156,65890,pass,
+after-v0-3,fresh + handoff note,prototype,2026-10-31,claude-opus-5-5,18,36,22886,976735,10197,1009854,42695,55667,65581,pass,
+after-v1-1,fresh + handoff note + lean rules,prototype,2026-10-31,claude-opus-5-5,11,22,40625,550029,7675,598351,41245,51313,64728,pass,
+after-v1-2,fresh + handoff note + lean rules,prototype,2026-10-31,claude-opus-5-5,17,34,36781,855228,8539,900582,44943,50754,60884,pass,
+after-v1-3,fresh + handoff note + lean rules,prototype,2026-10-31,claude-opus-5-5,17,34,35435,849171,7414,892054,42926,51571,59538,pass,
+nl-handoff-1,handoff with /newleaf,newleaf 1.0,2026-10-31,claude-opus-5-5,1,2,410212,31204,3127,444545,441418,441418,441418,pass,
+nl-handoff-2,handoff with /newleaf,newleaf 1.0,2026-10-31,claude-opus-5-5,1,2,406394,35022,3799,445217,441418,441418,441418,pass,
+nl-after-1,fresh + newleaf,newleaf 1.0,2026-10-31,claude-opus-5-5,13,26,37987,610337,5489,653839,45068,50268,54549,pass,
+nl-after-2,fresh + newleaf,newleaf 1.0,2026-10-31,claude-opus-5-5,16,32,35795,818032,8369,862228,42927,53319,59977,pass,
+nl-after-3,fresh + newleaf,newleaf 1.0,2026-10-31,claude-opus-5-5,17,34,15574,871613,10258,897479,45068,51451,60642,pass,
