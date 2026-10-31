@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 (2026-10-31)
+
+- Codex (experimental): a Codex manifest, `.codex-plugin/plugin.json`, with the hooks in Codex's own schema (`hooks/codex-hooks.json`), running the same bash scripts. Codex reads this repo's `.claude-plugin/marketplace.json`.
+- The guard also reads Codex's `token_count` log lines.
+- `/newleaf` tells the model to run the git facts itself where a tool does not fill them in.
+
 ## 1.0.0 (2026-10-31)
 
 First release.

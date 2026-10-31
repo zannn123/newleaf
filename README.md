@@ -46,6 +46,25 @@ any terminal (PowerShell, cmd, bash, your IDE).
 [Git for Windows](https://git-scm.com/downloads/win), which Claude Code
 recommends anyway. No Python, no Node, no network.
 
+### Codex (experimental)
+
+The same repo is also a Codex plugin: a Codex manifest (`.codex-plugin/`)
+with the hooks in Codex's own schema, and Codex reads this repo's marketplace
+file.
+
+```bash
+codex plugin marketplace add zannn123/newleaf
+codex plugin add newleaf@newleaf
+```
+
+Or add it in the Codex desktop app. Then run `/hooks` once to trust newleaf's
+hooks (Codex asks this for every plugin hook), start a new session, and use
+**`$newleaf`**, then **`/new`**.
+
+Status: built from Codex's official docs and its source code; the hook scripts
+are the ones tested above, plus tests against Codex's log format. It has not
+yet been measured in a live Codex session, and Codex on Windows is untested.
+
 ## Use
 
 1. Work as usual.

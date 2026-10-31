@@ -11,7 +11,9 @@ Facts, gathered just now:
 - changed files: !`git status --short 2>/dev/null | head -20`
 - recent commits: !`git log --oneline -5 2>/dev/null`
 
-Write the handoff note now, in this one reply, with no tool calls. Put it between the two marker lines exactly as shown, with no code fence around it: newleaf saves what is between them to `.newleaf/handoff.md` and loads it into the next session.
+If a fact above still shows its command instead of a value (some tools do not run these), run those commands yourself in one shell call first.
+
+Write the handoff note now, in this one reply, with no other tool calls. Put it between the two marker lines exactly as shown, with no code fence around it: newleaf saves what is between them to `.newleaf/handoff.md` and loads it into the next session.
 
 <newleaf-note>
 ---

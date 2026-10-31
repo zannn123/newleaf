@@ -56,6 +56,11 @@ check "guard: warn_at 0 turns it off" '[ -z "$(event s5 | hook guard)" ]'
 printf '{"warn_at": 500000}\n' > "$HOME/.claude/newleaf.json"
 check "guard: warn_at raises the bar" '[ -z "$(event s6 | hook guard)" ]'
 rm -f "$HOME/.claude/newleaf.json"
+tok() { printf '{"type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":%s,"cached_input_tokens":0,"output_tokens":9,"reasoning_output_tokens":0,"total_tokens":%s},"last_token_usage":{"input_tokens":%s,"cached_input_tokens":0,"output_tokens":9,"reasoning_output_tokens":0,"total_tokens":%s},"model_context_window":272000}}}\n' "$1" "$1" "$1" "$1"; }
+{ printf '{"type":"session_meta","payload":{"id":"x"}}\n'; tok 40000; printf '{"type":"event_msg","payload":{"type":"token_count","info":null}}\n'; tok 70000; } > "$tr"
+check "guard (Codex log): under twice the start, silent" '[ -z "$(event c1 | hook guard)" ]'
+tok 85000 >> "$tr"
+check "guard (Codex log): at 2x it speaks" '[[ $(event c1 | hook guard) == *"85k"*"2x its start (40k)"* ]]'
 if command -v cygpath >/dev/null 2>&1; then
   native=$(cygpath -w "$tr" | sed 's/\\/\\\\/g')
   out=$(printf '{"session_id":"s7","transcript_path":"%s"}' "$native" | hook guard)
@@ -79,6 +84,18 @@ out=$(printf '{"last_assistant_message":"Just a normal reply."}' | hook save)
 check "save: a reply without a note does nothing" '[ -z "$out" ]'
 printf '{"last_assistant_message":"<newleaf-note>\\n```\\n## Next\\nfenced\\n```\\n</newleaf-note>"}' | hook save >/dev/null
 check "save: a code fence around the note is dropped" '[ "$(cat "$proj/.newleaf/handoff.md")" = "$(printf "## Next\nfenced")" ]'
+
+# --- the two plugin layouts ------------------------------------------------
+check "Claude Code hooks file names the three scripts" 'for s in start guard save; do grep -q "hooks/$s.sh" "$here/hooks/hooks.json" || exit 1; done'
+check "Codex hooks file: same scripts, no Claude-only keys" 'for s in start guard save; do grep -q "hooks/$s.sh" "$here/hooks/codex-hooks.json" || exit 1; done; ! grep -q "\"shell\"" "$here/hooks/codex-hooks.json"'
+check "Codex manifest points at files that exist" '[ -d "$here/skills/newleaf" ] && [ -f "$here/hooks/codex-hooks.json" ] && grep -q "\"./hooks/codex-hooks.json\"" "$here/.codex-plugin/plugin.json"'
+check "both manifests carry the same version" '[ "$(grep -o "\"version\": *\"[^\"]*\"" "$here/.claude-plugin/plugin.json")" = "$(grep -o "\"version\": *\"[^\"]*\"" "$here/.codex-plugin/plugin.json")" ]'
+for py in python3 python; do
+  if "$py" -c '' 2>/dev/null; then
+    check "every JSON file parses" '"$py" -c "import json,sys; [json.load(open(f, encoding=\"utf-8\")) for f in sys.argv[1:]]" "$here"/.claude-plugin/*.json "$here"/.codex-plugin/*.json "$here"/hooks/*.json'
+    break
+  fi
+done
 
 echo "$fails failed"
 exit "$fails"

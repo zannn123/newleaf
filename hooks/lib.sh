@@ -79,13 +79,21 @@ config() {
 }
 
 # calls: from transcript lines on stdin, the input size of each main-thread API
-# call (fresh + cache write + cache read), and "reset" where a compaction falls
+# call, and "reset" where a compaction falls. Claude Code: an assistant entry's
+# usage (fresh + cache write + cache read). Codex: a token_count event's
+# last_token_usage.input_tokens (its input, cached part included; the field
+# order is Codex's protocol struct, and Codex calls its transcript unstable).
 calls() {
   LC_ALL=C awk '
     function num(k) { return match($0, "\"" k "\":[0-9]+") ? substr($0, RSTART + length(k) + 3, RLENGTH - length(k) - 3) + 0 : 0 }
     index($0, "\"compact_boundary\"") { print "reset"; next }
     index($0, "\"type\":\"assistant\"") && index($0, "\"usage\"") && !index($0, "\"isSidechain\":true") {
       s = num("input_tokens") + num("cache_creation_input_tokens") + num("cache_read_input_tokens")
+      if (s > 0) print s
+      next
+    }
+    index($0, "\"type\":\"token_count\"") && match($0, "\"last_token_usage\":[{]\"input_tokens\":[0-9]+") {
+      s = substr($0, RSTART + 35, RLENGTH - 35) + 0
       if (s > 0) print s
     }'
 }

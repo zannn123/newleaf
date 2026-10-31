@@ -1,0 +1,27 @@
+{
+  "description": "newleaf for Codex: the same bash hooks as Claude Code, in Codex's hooks schema. Codex sets CLAUDE_PLUGIN_ROOT for plugin hooks.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|clear|compact",
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/start.sh\"", "timeout": 30, "statusMessage": "newleaf: loading the handoff note" }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/guard.sh\"", "timeout": 30 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/save.sh\"", "timeout": 30 }
+        ]
+      }
+    ]
+  }
+}
