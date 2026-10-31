@@ -17,3 +17,6 @@ jobs:
       - name: Hook tests (bash, no Python)
         shell: bash
         run: bash tests/hooks.sh
+      - name: Codex hooks the way Codex runs them on Windows (cmd.exe /C)
+        if: runner.os == 'Windows'
+        run: python tests/windows_cmd.py

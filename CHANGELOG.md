@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 (2026-10-31)
+
+- Codex on Windows: Codex runs Windows hooks as `cmd.exe /C "<commandWindows>"`, where `$CLAUDE_PLUGIN_ROOT` never expands, so every hook failed there. Each Codex hook now has a `commandWindows` that runs `hooks/run.cmd`, which finds Git Bash (from `CLAUDE_CODE_GIT_BASH_PATH`, else next to your git) and runs the same bash hook, stdin and stdout passed through untouched.
+- `tests/windows_cmd.py` runs the Codex hooks exactly that way (also in CI on Windows).
+
 ## 1.1.0 (2026-10-31)
 
 - Codex (experimental): a Codex manifest, `.codex-plugin/plugin.json`, with the hooks in Codex's own schema (`hooks/codex-hooks.json`), running the same bash scripts. Codex reads this repo's `.claude-plugin/marketplace.json`.

@@ -1,25 +1,25 @@
 {
-  "description": "newleaf for Codex: the same bash hooks as Claude Code, in Codex's hooks schema. Codex sets CLAUDE_PLUGIN_ROOT for plugin hooks.",
+  "description": "newleaf for Codex: the same bash hooks as Claude Code, in Codex's hooks schema. Codex sets CLAUDE_PLUGIN_ROOT for plugin hooks; on Windows it runs commandWindows through cmd.exe, and run.cmd finds Git Bash.",
   "hooks": {
     "SessionStart": [
       {
         "matcher": "startup|clear|compact",
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/start.sh\"", "timeout": 30, "statusMessage": "newleaf: loading the handoff note" }
+          { "type": "command", "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/start.sh\"", "commandWindows": "\"%CLAUDE_PLUGIN_ROOT%\\hooks\\run.cmd\" start", "timeout": 30, "statusMessage": "newleaf: loading the handoff note" }
         ]
       }
     ],
     "UserPromptSubmit": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/guard.sh\"", "timeout": 30 }
+          { "type": "command", "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/guard.sh\"", "commandWindows": "\"%CLAUDE_PLUGIN_ROOT%\\hooks\\run.cmd\" guard", "timeout": 30 }
         ]
       }
     ],
     "Stop": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/save.sh\"", "timeout": 30 }
+          { "type": "command", "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/save.sh\"", "commandWindows": "\"%CLAUDE_PLUGIN_ROOT%\\hooks\\run.cmd\" save", "timeout": 30 }
         ]
       }
     ]
