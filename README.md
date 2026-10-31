@@ -17,6 +17,26 @@
 
 <p align="center"><a href="docs/newleaf-guide.pdf"><b>Read the 6-page guide (PDF)</b></a> · <a href="docs/proof">How it was measured</a></p>
 
+<table align="center">
+<tr><th>Claude Code</th><th>Codex (experimental, <a href="#codex-experimental">status</a>)</th></tr>
+<tr><td>
+
+```bash
+claude plugin marketplace add zannn123/newleaf
+claude plugin install newleaf@newleaf
+```
+
+</td><td>
+
+```bash
+codex plugin marketplace add zannn123/newleaf
+codex plugin add newleaf@newleaf
+```
+
+</td></tr>
+<tr><td>Then: <code>/newleaf</code>, <code>/clear</code></td><td>Then: trust its hooks in <code>/hooks</code>; <code>$newleaf</code>, <code>/new</code></td></tr>
+</table>
+
 ---
 
 ## Why your limits burn
