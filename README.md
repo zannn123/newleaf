@@ -155,6 +155,21 @@ real Claude Code.
 **Is anything sent anywhere?** No. The hooks read your local session log and
 write `.newleaf/` in your project.
 
+## Update
+
+```bash
+# Claude Code (then restart it)
+claude plugin marketplace update newleaf
+claude plugin update newleaf@newleaf
+
+# Codex (then trust the hooks again in /hooks: Codex asks whenever hook files change)
+codex plugin marketplace upgrade newleaf
+codex plugin add newleaf@newleaf
+```
+
+What changed in each version: [CHANGELOG](CHANGELOG.md). Codex on Windows needs
+1.1.1 or later.
+
 ## Uninstall
 
 ```bash
