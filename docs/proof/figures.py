@@ -53,23 +53,21 @@ def problem(runs):
     for g, label, cls in groups:
         rs = [r for r in runs if r['group'] == g]
         stats.append((label, cls, len(rs), statistics.mean(int(r['context_median']) for r in rs),
-                      min(int(r['context_first']) for r in rs), max(int(r['context_max']) for r in rs),
                       statistics.mean(int(r['calls']) for r in rs)))
-    top = max(s[5] for s in stats)
-    w, h, left, span = 1280, 420, 340, 820
+    top = max(s[3] for s in stats)
+    w, h, left = 1280, 400, 340
+    span = w - left - 48 - 200  # leaves room for the value after the longest bar
     body = ['  <text x="48" y="78" font-size="30" font-weight="800" class="ink">Every step re-sends the whole chat</text>',
-            '  <text x="48" y="110" font-size="17" class="muted">Tokens re-sent on each step of the same task. Bar: the runs\' median step. '
-            'Line: from the smallest first step to the largest step.</text>']
-    y = 158
-    for label, cls, n, med, lo, hi, calls in stats:
+            '  <text x="48" y="110" font-size="17" class="muted">Tokens re-sent on a typical step of the same task '
+            '(the median step of the runs).</text>']
+    y = 150
+    for label, cls, n, med, calls in stats:
+        bw = max(6, med / top * span)
         body.append(f'  <text x="48" y="{y + 30}" font-size="21" font-weight="700" class="ink">{label}</text>')
         body.append(f'  <text x="48" y="{y + 56}" font-size="15" class="muted">{n} runs, about {calls:.0f} steps each</text>')
-        body.append(f'  <line class="grid" x1="{left + lo / top * span:.1f}" x2="{left + hi / top * span:.1f}" y1="{y + 34}" y2="{y + 34}" '
-                    f'stroke-width="3"/>')
-        body.append(f'  <rect class="{cls}" x="{left}" y="{y + 14}" width="{max(6, med / top * span):.1f}" height="40" rx="8"/>')
-        body.append(f'  <text x="{left + max(6, hi / top * span) + 16:.0f}" y="{y + 42}" font-size="20" font-weight="700" class="ink">'
-                    f'{fmt(med)} per step</text>')
-        y += 104
+        body.append(f'  <rect class="{cls}" x="{left}" y="{y + 14}" width="{bw:.1f}" height="40" rx="8"/>')
+        body.append(f'  <text x="{left + bw + 16:.0f}" y="{y + 42}" font-size="20" font-weight="700" class="ink">{fmt(med)} per step</text>')
+        y += 100
     body.append(f'  <text x="48" y="{h - 30}" font-size="15" class="muted">From Claude Code\'s own session logs. '
                 f'Data: docs/proof/runs.csv</text>')
     return svg(w, h, 'Every step re-sends the whole chat', 'Median tokens re-sent per step: '
@@ -91,16 +89,18 @@ def proof(runs):
     y = 150
     for label, cls, rs in rows:
         mean = statistics.mean(int(r['total_tokens']) for r in rs)
+        calls = round(statistics.mean(int(r['calls']) for r in rs))
         body.append(f'  <text x="48" y="{y + 26}" font-size="20" font-weight="700" class="ink">{label}</text>')
-        body.append(f'  <text x="48" y="{y + 52}" font-size="15" class="muted">{len(rs)} runs, {statistics.mean(int(r["calls"]) for r in rs):.0f} calls, '
+        body.append(f'  <text x="48" y="{y + 52}" font-size="15" class="muted">{len(rs)} runs, {calls} call{"" if calls == 1 else "s"} each, '
                     f'all {"passed" if all(r["quality"] == "pass" for r in rs) else "checked"}</text>')
         bh = min(18, 60 / len(rs))
         for k, r in enumerate(rs):
             v = int(r['total_tokens'])
             body.append(f'  <rect class="{cls}" x="{left}" y="{y + 6 + k * (bh + 5):.1f}" width="{max(4, v / top * span):.1f}" '
                         f'height="{bh:.1f}" rx="5"/>')
-        body.append(f'  <text x="{left + max(4, mean / top * span) + 14:.0f}" y="{y + 34}" font-size="18" font-weight="700" class="ink">'
-                    f'{fmt(mean)}</text>')
+        longest = max(int(r['total_tokens']) for r in rs)
+        body.append(f'  <text x="{left + max(4, longest / top * span) + 16:.0f}" y="{y + 34}" font-size="18" font-weight="700" class="ink">'
+                    f'{fmt(mean)} avg</text>')
         y += 96
     body.append(f'  <text x="48" y="{h - 34}" font-size="15" class="muted">One bar per run: total tokens (input re-sent + written) '
                 f'from Claude Code\'s own session logs. Data: docs/proof/runs.csv</text>')

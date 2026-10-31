@@ -15,6 +15,8 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-16A34A" alt="MIT license"></a>
 </p>
 
+<p align="center"><a href="docs/newleaf-guide.pdf"><b>Read the 6-page guide (PDF)</b></a> · <a href="docs/proof">How it was measured</a></p>
+
 ---
 
 ## Why your limits burn

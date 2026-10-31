@@ -16,26 +16,26 @@
   <text x="48" y="78" font-size="30" font-weight="800" class="accent">86% fewer tokens per task</text>
   <text x="48" y="110" font-size="17" class="muted">Same task, same code, same model; every run passed the same quality checks. Mean 5.83M before, 805k with newleaf.</text>
   <text x="48" y="176" font-size="20" font-weight="700" class="ink">Resumed long chat</text>
-  <text x="48" y="202" font-size="15" class="muted">2 runs, 13 calls, all passed</text>
+  <text x="48" y="202" font-size="15" class="muted">2 runs, 13 calls each, all passed</text>
   <rect class="old" x="330" y="156.0" width="760.0" height="18.0" rx="5"/>
   <rect class="old" x="330" y="179.0" width="648.4" height="18.0" rx="5"/>
-  <text x="1048" y="184" font-size="18" font-weight="700" class="ink">5.83M</text>
+  <text x="1106" y="184" font-size="18" font-weight="700" class="ink">5.83M avg</text>
   <text x="48" y="272" font-size="20" font-weight="700" class="ink">Fresh, no plugin</text>
-  <text x="48" y="298" font-size="15" class="muted">3 runs, 17 calls, all passed</text>
+  <text x="48" y="298" font-size="15" class="muted">3 runs, 17 calls each, all passed</text>
   <rect class="old" x="330" y="252.0" width="143.2" height="18.0" rx="5"/>
   <rect class="old" x="330" y="275.0" width="103.1" height="18.0" rx="5"/>
   <rect class="old" x="330" y="298.0" width="94.5" height="18.0" rx="5"/>
-  <text x="458" y="280" font-size="18" font-weight="700" class="ink">941k</text>
+  <text x="489" y="280" font-size="18" font-weight="700" class="ink">941k avg</text>
   <text x="48" y="368" font-size="20" font-weight="700" class="ink">Fresh + newleaf</text>
-  <text x="48" y="394" font-size="15" class="muted">3 runs, 15 calls, all passed</text>
+  <text x="48" y="394" font-size="15" class="muted">3 runs, 15 calls each, all passed</text>
   <rect class="accent" x="330" y="348.0" width="78.9" height="18.0" rx="5"/>
   <rect class="accent" x="330" y="371.0" width="104.1" height="18.0" rx="5"/>
   <rect class="accent" x="330" y="394.0" width="108.3" height="18.0" rx="5"/>
-  <text x="441" y="376" font-size="18" font-weight="700" class="ink">805k</text>
+  <text x="454" y="376" font-size="18" font-weight="700" class="ink">805k avg</text>
   <text x="48" y="464" font-size="20" font-weight="700" class="ink">One /newleaf handoff</text>
-  <text x="48" y="490" font-size="15" class="muted">2 runs, 1 calls, all passed</text>
+  <text x="48" y="490" font-size="15" class="muted">2 runs, 1 call each, all passed</text>
   <rect class="accent" x="330" y="444.0" width="53.7" height="18.0" rx="5"/>
   <rect class="accent" x="330" y="467.0" width="53.7" height="18.0" rx="5"/>
-  <text x="398" y="472" font-size="18" font-weight="700" class="ink">445k</text>
+  <text x="400" y="472" font-size="18" font-weight="700" class="ink">445k avg</text>
   <text x="48" y="550" font-size="15" class="muted">One bar per run: total tokens (input re-sent + written) from Claude Code's own session logs. Data: docs/proof/runs.csv</text>
 </svg>

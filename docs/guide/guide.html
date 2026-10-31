@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The newleaf guide</title>
+<style>
+  :root { --bg: #F6FAF4; --card: #FFFFFF; --line: #DCE8DD; --ink: #0F1A12; --muted: #536657; --accent: #16A34A; --mint: #E4F6E9; }
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #FFFFFF; color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 10.5pt; line-height: 1.5; }
+  .page { width: 210mm; height: 297mm; padding: 18mm 18mm 14mm; position: relative; page-break-after: always; overflow: hidden; }
+  .page:last-child { page-break-after: auto; }
+  .foot { position: absolute; left: 18mm; right: 18mm; bottom: 9mm; display: flex; justify-content: space-between;
+    font-size: 8.5pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 3mm; }
+  h1 { font-size: 26pt; line-height: 1.1; margin: 0 0 3mm; letter-spacing: -0.5px; }
+  h2 { font-size: 17pt; margin: 0 0 4mm; letter-spacing: -0.3px; }
+  h3 { font-size: 11.5pt; margin: 6mm 0 2mm; }
+  p { margin: 0 0 3mm; }
+  .lead { font-size: 12pt; color: var(--muted); margin-bottom: 6mm; }
+  .kicker { font-size: 9pt; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin-bottom: 2mm; }
+  img.fig { width: 100%; display: block; margin: 4mm 0 5mm; border-radius: 8px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin: 8mm 0; }
+  .stat { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 5mm; }
+  .stat b { display: block; font-size: 24pt; line-height: 1.1; color: var(--accent); letter-spacing: -0.5px; }
+  .stat span { color: var(--muted); font-size: 9.5pt; }
+  table { width: 100%; border-collapse: collapse; margin: 3mm 0 5mm; font-size: 9.5pt; }
+  th, td { text-align: left; padding: 2.2mm 2.5mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.6px; }
+  tr.hl td { background: var(--mint); font-weight: 600; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 9pt; }
+  code { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 0 1.2mm; }
+  pre { background: var(--ink); color: #E8F5EC; border-radius: 8px; padding: 4mm 5mm; margin: 2mm 0 4mm; white-space: pre-wrap; line-height: 1.55; }
+  pre .c { color: #8FB79A; }
+  .note { background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 6px;
+    padding: 3.5mm 5mm; margin: 3mm 0 4mm; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 8.5pt;
+    white-space: pre-wrap; line-height: 1.5; color: var(--ink); }
+  ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 1.2mm; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .qa h3 { margin-top: 4.5mm; }
+  .cover { background: var(--bg); }
+  .cover .meta { position: absolute; left: 18mm; bottom: 26mm; color: var(--muted); font-size: 9.5pt; }
+</style>
+</head>
+<body>
+
+<section class="page cover">
+  <img class="fig" src="img/banner.svg" alt="newleaf">
+  <div class="kicker">The guide</div>
+  <h1>Fresh Claude Code sessions<br>that keep the thread</h1>
+  <p class="lead">newleaf writes a handoff note in one call, loads it into your next session on its own, and tells you when a chat has grown costly. Starting fresh stops costing you your context, so you can do it often, and stop paying to re-send a giant conversation on every step.</p>
+  <div class="stats">
+    <div class="stat"><b>−86%</b><span>tokens per task, measured on the same task with the same quality</span></div>
+    <div class="stat"><b>1 call</b><span>to write the handoff note, saved by a hook</span></div>
+    <div class="stat"><b>0 setup</b><span>works in every project, from any terminal</span></div>
+  </div>
+  <p>Inside: why your limits burn (page 2), how newleaf works (3), installing and using it (4), the proof and how it was measured (5), and answers to common questions (6).</p>
+  <div class="meta">Version 1.0.0 · 2026-10-31 · MIT licence<br>github.com/zannn123/newleaf</div>
+  <div class="foot"><span>newleaf guide</span><span>1</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">The problem</div>
+  <h2>Why your limits burn</h2>
+  <p>A Claude Code session is a conversation, and every step of it (each tool call, each answer) sends the whole conversation to the model again. A cache makes the re-sending cheaper, but it still counts. Keep one session open for days and each step drags hundreds of thousands of tokens along, so even a one-line change costs millions.</p>
+  <img class="fig" src="img/problem.svg" alt="Tokens re-sent per step: 447k in a resumed long chat, 52k in a fresh session with newleaf">
+  <h3>What the logs said</h3>
+  <ul>
+    <li>14 days of real Claude Code logs, 8,030 API calls: <b>99%</b> of all tokens were the conversation being re-sent; the model's replies were <b>0.3%</b>.</li>
+    <li>The long-running session re-sent a median of <b>548k</b> tokens per call; a fresh session started near <b>58k</b>.</li>
+    <li>A small request (five calls or fewer) in that session cost a median of <b>1.5 million</b> tokens.</li>
+  </ul>
+  <p>So writing shorter replies cannot save much. What saves is a smaller conversation. People keep long sessions because a fresh one forgets the rules and decisions they set up. newleaf removes that reason.</p>
+  <div class="foot"><span>newleaf guide · why your limits burn</span><span>2</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">How it works</div>
+  <h2>A loop of four steps</h2>
+  <img class="fig" src="img/flow.svg" alt="Work, /newleaf, /clear, fresh start">
+  <table>
+    <tr><th style="width:24%">Piece</th><th>What it does</th></tr>
+    <tr><td><code>/newleaf</code></td><td>One reply writes the note. The branch, commit, changed files and recent commits are gathered before the model reads the skill, so the note costs a single call.</td></tr>
+    <tr><td>Stop hook</td><td>Takes the note from the reply and saves it to <code>.newleaf/handoff.md</code>, keeps the old one as <code>handoff.prev.md</code>, and adds a <code>.gitignore</code> so the folder never reaches git.</td></tr>
+    <tr><td>Start hook</td><td>On every new session, <code>/clear</code> and compaction, loads the lean working rules and the note, and says if the branch or commit moved on since the note.</td></tr>
+    <tr><td>Guard</td><td>Before each prompt, compares what a step re-sends now with the chat's first step. At 2× it says so, again at 4× and 8×. A handoff costs one call, so past 2× it pays back within the next request.</td></tr>
+  </table>
+  <h3>A note looks like this</h3>
+  <div class="note">---
+written: 2026-10-31T18:42:00+0800
+branch: feature/checkout
+head: 9f3c2a1
+---
+## Rules in play
+- "No hard-coded colours: use the theme tokens."
+## Decided
+- The split button keeps its arrow menu; only its style changes.
+## State
+- Done: line style on both halves, report tests pass. Not committed.
+## Next
+- Commit, then update the mockup.
+## Open
+- Should "Excel" stay first in the menu?</div>
+  <div class="foot"><span>newleaf guide · how it works</span><span>3</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">Install and use</div>
+  <h2>Two commands, then three keystrokes a round</h2>
+  <pre><span class="c"># in any terminal: PowerShell, cmd, bash, zsh</span>
+claude plugin marketplace add zannn123/newleaf
+claude plugin install newleaf@newleaf</pre>
+  <p>Or inside Claude Code: <code>/plugin marketplace add zannn123/newleaf</code>, then <code>/plugin install newleaf@newleaf</code>. It applies to every project from then on.</p>
+  <p><b>Needs:</b> bash. It is built in on macOS, Linux and WSL; on Windows it comes with Git for Windows, which Claude Code recommends. No Python, no Node, no network.</p>
+  <h3>Every round of work</h3>
+  <ol>
+    <li>Work as usual.</li>
+    <li>When the round ends, or the guard speaks, type <code>/newleaf</code>. One reply writes the note and the hook saves it.</li>
+    <li>Type <code>/clear</code>. The fresh session starts with the note and the rules.</li>
+  </ol>
+  <p>The guard's line looks like this:</p>
+  <pre>newleaf: every step of this chat now re-sends 612k tokens, 10x its start (59k).
+Type /newleaf, then /clear: the next session starts small with the note.</pre>
+  <h3>Settings (optional)</h3>
+  <p><code>~/.claude/newleaf.json</code> for your machine, or <code>.newleaf/config.json</code> in a project; the project wins.</p>
+  <table>
+    <tr><th style="width:18%">Key</th><th style="width:28%">Default</th><th>Meaning</th></tr>
+    <tr><td><code>rules</code></td><td><code>true</code></td><td><code>false</code> leaves out the lean working rules.</td></tr>
+    <tr><td><code>warn_at</code></td><td>2× the chat's first step</td><td>Tokens per step that wake the guard; <code>0</code> turns it off.</td></tr>
+  </table>
+  <h3>Remove</h3>
+  <pre>claude plugin uninstall newleaf
+claude plugin marketplace remove newleaf</pre>
+  <div class="foot"><span>newleaf guide · install and use</span><span>4</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">Proof</div>
+  <h2>Measured, not estimated</h2>
+  <p>One real task on a real production Flutter codebase: restyle a split button. Same starting code, same prompt, same model (Claude Opus). Tokens come from Claude Code's own session logs: everything each call re-sent plus everything it wrote. Every run had to pass the same checks: the project's 97 report tests, the analyzer, no hard-coded colour, and changes only inside the feature's folder.</p>
+  <img class="fig" src="img/proof.svg" alt="Tokens per task for every run">
+  <table>
+    <tr><th>Condition</th><th>Runs</th><th>Tokens per task</th><th>Calls</th><th>Re-sent per call</th><th>Quality</th></tr>
+    <tr><td>Resumed long chat (before)</td><td>2</td><td>5.83M</td><td>13</td><td>447k</td><td>2 / 2</td></tr>
+    <tr><td>Fresh session, no plugin</td><td>3</td><td>941k</td><td>17</td><td>57k</td><td>3 / 3</td></tr>
+    <tr class="hl"><td>Fresh session + newleaf</td><td>3</td><td>805k</td><td>15</td><td>52k</td><td>3 / 3</td></tr>
+    <tr><td>One <code>/newleaf</code> handoff</td><td>2</td><td>445k</td><td>1</td><td>441k</td><td>2 / 2 notes</td></tr>
+  </table>
+  <ul>
+    <li><b>86% fewer tokens per task.</b> 79% fewer on the first task even counting the handoff; 85% over five tasks.</li>
+    <li>"Before" resumed a real session at the moment its owner paused work, 440k tokens of history, exactly as one would resume it.</li>
+    <li>Limits: one codebase, one task type, headless runs. Your numbers will differ; <code>tools/measure.py</code> shows yours.</li>
+  </ul>
+  <div class="foot"><span>newleaf guide · proof (data: docs/proof/runs.csv)</span><span>5</span></div>
+</section>
+
+<section class="page qa">
+  <div class="kicker">Questions</div>
+  <h2>Answers</h2>
+  <div class="two">
+    <div>
+      <h3>Does it work with caveman?</h3>
+      <p>Yes, they add up. caveman shortens replies, about 0.3% of tokens; newleaf cuts the re-sent conversation, about 99%.</p>
+      <h3>Where is my note?</h3>
+      <p><code>.newleaf/handoff.md</code> in the project, the previous one in <code>handoff.prev.md</code>. Git ignores the folder on its own.</p>
+      <h3>Will a fresh session forget my rules?</h3>
+      <p>Not the ones in the note: "Rules in play" carries them in your words, and the start hook loads the note before your first prompt.</p>
+      <h3>Is anything sent anywhere?</h3>
+      <p>No. The hooks read your local session log and write <code>.newleaf/</code> in your project. No telemetry.</p>
+    </div>
+    <div>
+      <h3>The guard speaks too soon</h3>
+      <p>Set <code>warn_at</code> to the tokens per step you accept, or <code>0</code> to switch it off.</p>
+      <h3>Nothing happens on Windows</h3>
+      <p>The hooks need bash: install Git for Windows. Then <code>claude plugin list</code> should show <code>newleaf</code> enabled.</p>
+      <h3>How do I check it works?</h3>
+      <p>Clone the repo and run <code>bash tests/hooks.sh</code> (every hook, offline) and <code>bash tests/smoke.sh</code> (end to end with your Claude Code).</p>
+      <h3>Where was it tested?</h3>
+      <p>Windows 11 (Git Bash), Ubuntu, Debian (mawk), Alpine (busybox awk) and macOS (CI).</p>
+    </div>
+  </div>
+  <div class="foot"><span>newleaf guide · github.com/zannn123/newleaf</span><span>6</span></div>
+</section>
+
+</body>
+</html>

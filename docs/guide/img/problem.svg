@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-labelledby="t d">
+  <title id="t">Every step re-sends the whole chat</title>
+  <desc id="d">Median tokens re-sent per step: 447k in a resumed long chat, 52k in a fresh session with newleaf.</desc>
+  <style>
+    .bg { fill: #F6FAF4; } .card { fill: #FFFFFF; stroke: #DCE8DD; stroke-width: 1.5; }
+    .ink { fill: #0F1A12; } .muted { fill: #536657; } .accent { fill: #16A34A; } .old { fill: #B4C2B8; }
+    .grid { stroke: #E3ECE4; stroke-width: 1; } .tick { fill: #7C8E80; }
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+      </style>
+  <rect class="bg" width="1280" height="400" rx="28"/>
+  <text x="48" y="78" font-size="30" font-weight="800" class="ink">Every step re-sends the whole chat</text>
+  <text x="48" y="110" font-size="17" class="muted">Tokens re-sent on a typical step of the same task (the median step of the runs).</text>
+  <text x="48" y="180" font-size="21" font-weight="700" class="ink">Resumed long chat</text>
+  <text x="48" y="206" font-size="15" class="muted">2 runs, about 13 steps each</text>
+  <rect class="old" x="340" y="164" width="692.0" height="40" rx="8"/>
+  <text x="1048" y="192" font-size="20" font-weight="700" class="ink">447k per step</text>
+  <text x="48" y="280" font-size="21" font-weight="700" class="ink">Fresh session + newleaf</text>
+  <text x="48" y="306" font-size="15" class="muted">3 runs, about 15 steps each</text>
+  <rect class="accent" x="340" y="264" width="80.0" height="40" rx="8"/>
+  <text x="436" y="292" font-size="20" font-weight="700" class="ink">52k per step</text>
+  <text x="48" y="370" font-size="15" class="muted">From Claude Code's own session logs. Data: docs/proof/runs.csv</text>
+</svg>
