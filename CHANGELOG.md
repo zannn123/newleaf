@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 (2026-11-02)
+
+- `/newleaf` works outside a git repository (a home folder, say). Its `git log` fact had no fallback, so it failed there and Claude Code stopped the skill with "Shell command failed". Every fact command now ends cleanly anywhere; `tests/hooks.sh` runs each one inside and outside a repo, and `tests/smoke.sh` saves a real note outside one.
+
 ## 1.1.1 (2026-10-31)
 
 - Codex on Windows: Codex runs Windows hooks as `cmd.exe /C "<commandWindows>"`, where `$CLAUDE_PLUGIN_ROOT` never expands, so every hook failed there. Each Codex hook now has a `commandWindows` that runs `hooks/run.cmd`, which finds Git Bash (from `CLAUDE_CODE_GIT_BASH_PATH`, else next to your git) and runs the same bash hook, stdin and stdout passed through untouched.

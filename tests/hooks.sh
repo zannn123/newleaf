@@ -85,6 +85,14 @@ check "save: a reply without a note does nothing" '[ -z "$out" ]'
 printf '{"last_assistant_message":"<newleaf-note>\\n```\\n## Next\\nfenced\\n```\\n</newleaf-note>"}' | hook save >/dev/null
 check "save: a code fence around the note is dropped" '[ "$(cat "$proj/.newleaf/handoff.md")" = "$(printf "## Next\nfenced")" ]'
 
+# --- the skill's facts run anywhere: Claude Code stops the skill if one fails -
+plain="$tmp/plain"
+mkdir -p "$plain"
+facts=$(sed -n 's/.*!`\(.*\)`.*/\1/p' "$here/skills/newleaf/SKILL.md")
+check "skill: it has fact commands" '[ "$(printf "%s\n" "$facts" | grep -c .)" -ge 5 ]'
+check "skill: every fact command exits 0 outside a git repo" 'while IFS= read -r c; do (cd "$plain" && GIT_CEILING_DIRECTORIES="$tmp" bash -c "$c" >/dev/null 2>&1) || exit 1; done <<< "$facts"'
+check "skill: and inside one" 'while IFS= read -r c; do (cd "$proj" && bash -c "$c" >/dev/null 2>&1) || exit 1; done <<< "$facts"'
+
 # --- the two plugin layouts ------------------------------------------------
 check "Claude Code hooks file names the three scripts" 'for s in start guard save; do grep -q "hooks/$s.sh" "$here/hooks/hooks.json" || exit 1; done'
 check "Codex hooks file: same scripts, no Claude-only keys" 'for s in start guard save; do grep -q "hooks/$s.sh" "$here/hooks/codex-hooks.json" || exit 1; done; ! grep -q "\"shell\"" "$here/hooks/codex-hooks.json"'

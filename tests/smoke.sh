@@ -55,5 +55,15 @@ else
   fail "3b the note folder shows in git status: $(git -C "$repo" status --porcelain | head -3 | tr '\n' ' ')"
 fi
 
+# 4 /newleaf in a folder that is not a git repo (a home folder, say)
+plain="$tmp/plain"
+mkdir -p "$plain"
+reply=$(cd "$plain" && printf '%s' '/newleaf' | GIT_CEILING_DIRECTORIES="$tmp" MSYS_NO_PATHCONV=1 claude -p ${model:+--model "$model"} "${extra[@]}" --no-session-persistence 2>/dev/null)
+if [ -s "$plain/.newleaf/handoff.md" ] && grep -q '^## Next' "$plain/.newleaf/handoff.md"; then
+  pass "4 /newleaf outside a git repo: the note is saved"
+else
+  fail "4 /newleaf outside a git repo (reply: ${reply:0:200})"
+fi
+
 echo "$fails failed"
 exit "$fails"

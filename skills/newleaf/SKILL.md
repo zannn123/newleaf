@@ -9,7 +9,7 @@ Facts, gathered just now:
 - branch: !`git rev-parse --abbrev-ref HEAD 2>/dev/null || echo none`
 - head: !`git rev-parse --short HEAD 2>/dev/null || echo none`
 - changed files: !`git status --short 2>/dev/null | head -20`
-- recent commits: !`git log --oneline -5 2>/dev/null`
+- recent commits: !`git log --oneline -5 2>/dev/null || echo none`
 
 If a fact above still shows its command instead of a value (some tools do not run these), run those commands yourself in one shell call first.
 
