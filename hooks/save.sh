@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # newleaf, Stop: when the reply carries a handoff note between <newleaf-note>
-# markers (the /newleaf skill writes one), saves it to .newleaf/handoff.md,
-# keeps the old one as handoff.prev.md, and adds a .gitignore that keeps the
-# folder out of git. Claude Code passes the reply as last_assistant_message.
+# markers (the /newleaf skill writes one), saves it as this session's own note
+# in .newleaf/notes/ and as the folder's latest, .newleaf/handoff.md (the old
+# latest becomes handoff.prev.md), and adds a .gitignore that keeps the folder
+# out of git. Claude Code passes the reply as last_assistant_message.
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 input=$(cat)
 msg=$(printf '%s' "$input" | json_str last_assistant_message)
@@ -24,7 +25,18 @@ note=$(printf '%s\n' "$msg" | LC_ALL=C awk '
 dir="$(project_dir "$input")/.newleaf"
 mkdir -p "$dir" || exit 0
 [ -f "$dir/.gitignore" ] || printf '# newleaf: keep handoff notes out of git\n*\n' > "$dir/.gitignore"
-[ -f "$dir/handoff.md" ] && mv -f "$dir/handoff.md" "$dir/handoff.prev.md"
-printf '%s\n' "$note" > "$dir/handoff.md"
+
+# written aside, then moved: a session starting right now never sees half a note
+tmp="$dir/.tmp.$$"
+printf '%s\n' "$note" > "$tmp"
+sid=$(session_id "$input")
+if [ -n "$sid" ] && mkdir -p "$dir/notes"; then
+  cp -f "$tmp" "$dir/notes/$sid.md"
+  # /clear keeps the process, so this is how the next session finds this note
+  [ -z "${CLAUDE_PID:-}" ] || printf '%s' "$sid" > "$dir/notes/pid-$CLAUDE_PID.link"
+  ls -t "$dir/notes" | tail -n +41 | while IFS= read -r old; do rm -f "$dir/notes/$old"; done
+fi
+[ -f "$dir/handoff.md" ] && cp -f "$dir/handoff.md" "$dir/handoff.prev.md"
+mv -f "$tmp" "$dir/handoff.md"
 printf '{"systemMessage": "newleaf: note saved to .newleaf/handoff.md (%s lines). Type /clear to continue in a fresh session that starts with it."}\n' \
   "$(printf '%s\n' "$note" | wc -l | tr -d ' ')"

@@ -7,6 +7,7 @@ here=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 tmp=$(mktemp -d)
 trap '[ -d "$tmp" ] && rm -rf -- "$tmp"' EXIT
 export HOME="$tmp/home" CLAUDE_PROJECT_DIR="$tmp/proj" CLAUDE_PLUGIN_DATA="$tmp/data"
+unset CLAUDE_PID   # each check below says which process it plays
 proj=$CLAUDE_PROJECT_DIR
 mkdir -p "$HOME/.claude" "$proj/.newleaf"
 fails=0
@@ -22,14 +23,17 @@ out=$(printf '{}' | hook start)
 check "start: rules off and no note print nothing" '[ -z "$out" ]'
 g init -q && g commit -q --allow-empty -m one
 head=$(g rev-parse --short HEAD) branch=$(g rev-parse --abbrev-ref HEAD)
-printf -- '---\nwritten: now\nbranch: %s\nhead: %s\n---\n## Next\nship it\n' "$branch" "$head" > "$proj/.newleaf/handoff.md"
-out=$(printf '{}' | hook start)
+mkdir -p "$proj/.newleaf/notes"
+printf -- '---\nwritten: now\nbranch: %s\nhead: %s\n---\n## Next\nship it\n' "$branch" "$head" > "$proj/.newleaf/notes/me.md"
+cp "$proj/.newleaf/notes/me.md" "$proj/.newleaf/handoff.md"
+own() { printf '{"session_id":"me","source":"compact"}' | hook start; }
+out=$(own)
 check "start: the note, no drift at its own commit" '[[ $out == *"ship it"* && $out != *"Since the note"* && $out != *"Lean working"* ]]'
 g commit -q --allow-empty -m two && g commit -q --allow-empty -m three
-out=$(printf '{}' | hook start)
+out=$(own)
 check "start: two commits later" '[[ $out == *"2 commits after the note ($head)"* ]]'
 g checkout -q -b other
-out=$(printf '{}' | hook start)
+out=$(own)
 check "start: another branch" '[[ $out == *"the note says $branch"* ]]'
 rm -f "$proj/.newleaf/config.json"
 
@@ -84,6 +88,55 @@ out=$(printf '{"last_assistant_message":"Just a normal reply."}' | hook save)
 check "save: a reply without a note does nothing" '[ -z "$out" ]'
 printf '{"last_assistant_message":"<newleaf-note>\\n```\\n## Next\\nfenced\\n```\\n</newleaf-note>"}' | hook save >/dev/null
 check "save: a code fence around the note is dropped" '[ "$(cat "$proj/.newleaf/handoff.md")" = "$(printf "## Next\nfenced")" ]'
+
+# --- two sessions in one folder: neither gets the other's note --------------
+rm -rf "$proj/.newleaf"
+say() { printf '{"session_id":"%s","last_assistant_message":"<newleaf-note>\\n---\\nwritten: w\\nbranch: none\\nhead: none\\n---\\n## Next\\n%s\\n</newleaf-note>"}' "$1" "$3" | CLAUDE_PID=$2 hook save >/dev/null; }
+begin() { printf '{"session_id":"%s","source":"%s"}' "$1" "$3" | CLAUDE_PID=$2 hook start; }
+say A 111 task-a
+say B 222 task-b
+out=$(begin A 111 compact)
+check "two sessions: A's compaction gets A's note, not B's" '[[ $out == *task-a* && $out != *task-b* ]]'
+check "two sessions: it says where that note is" '[[ $out == *".newleaf/notes/A.md"* ]]'
+out=$(begin B 222 compact)
+check "two sessions: B's compaction gets B's note" '[[ $out == *task-b* && $out != *task-a* ]]'
+out=$(begin A2 111 clear)
+check "two sessions: A's /clear gets A's note, not B's" '[[ $out == *task-a* && $out != *task-b* && $out == *"build on it"* ]]'
+out=$(begin B2 222 clear)
+check "two sessions: B's /clear gets B's note" '[[ $out == *task-b* && $out != *task-a* ]]'
+out=$(begin A2 111 compact)
+check "two sessions: the note stays with the session /clear started" '[[ $out == *task-a* && $out != *task-b* ]]'
+out=$(begin A3 111 clear)
+check "two sessions: and through another /clear" '[[ $out == *task-a* && $out != *task-b* ]]'
+out=$(begin C 333 startup)
+check "a brand-new session gets one line about the note, not the note" '[[ $out == *"earlier session"* && $out == *".newleaf/handoff.md (written w, branch none, head none)"* && $out != *task-* && $out != *"build on it"* ]]'
+check "and it is told the note may be other work" '[[ $out == *"other work"* ]]'
+out=$(begin D 444 clear)
+check "/clear with no note of its own: one line, not another session's note" '[[ $out == *"earlier session"* && $out != *task-* ]]'
+out=$(begin E 555 compact)
+check "a compaction with no note of its own: nothing about notes" '[[ $out != *handoff* && $out != *task-* ]]'
+say B 222 task-b2
+say B 222 task-b3
+out=$(begin A3 111 compact)
+check "B saving again and again leaves A's note alone" '[[ $out == *task-a* ]]'
+say P 888 old-work
+begin N 888 startup >/dev/null
+out=$(begin N2 888 clear)
+check "a reused process id does not bring back a dead process's note" '[[ $out != *old-work* ]]'
+for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45; do : > "$proj/.newleaf/notes/old$i.md"; done
+say Q 999 newest
+check "old notes are trimmed, the newest stays" '[ "$(ls "$proj/.newleaf/notes" | wc -l)" -le 40 ] && grep -q newest "$proj/.newleaf/notes/Q.md"'
+check "the notes stay out of git" '[ -z "$(git -C "$proj" status --porcelain)" ]'
+
+rm -rf "$proj/.newleaf"
+for s in startup clear compact; do begin Z 777 "$s" >/dev/null; done
+check "a folder with no note stays untouched" '[ ! -e "$proj/.newleaf" ]'
+
+# one session: /newleaf then /clear gives the model the same bytes the token proof measured
+say S 666 only-note
+out=$(begin S2 666 clear)
+want=$(cat "$here/rules.md"; printf '\nHandoff note from the last session (.newleaf/handoff.md). It records what was decided: build on it, do not re-decide it.\n\n---\nwritten: w\nbranch: none\nhead: none\n---\n## Next\nonly-note\n')
+check "one session: /clear gives the same bytes as the measured runs" '[ "$out" = "$want" ]'
 
 # --- the skill's facts run anywhere: Claude Code stops the skill if one fails -
 plain="$tmp/plain"

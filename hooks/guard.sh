@@ -25,7 +25,7 @@ level=0 step=$limit
 while [ $((step * 2)) -le "$now" ]; do step=$((step * 2)) level=$((level + 1)); done
 state_dir=$(unix_path "${CLAUDE_PLUGIN_DATA:-${TMPDIR:-/tmp}}")
 mkdir -p "$state_dir" 2>/dev/null
-sid=$(printf '%s' "$input" | json_str session_id | tr -cd 'A-Za-z0-9-')
+sid=$(session_id "$input")
 state="$state_dir/newleaf-guard-${sid:-none}"
 shown=$(cat "$state" 2>/dev/null)
 [ -n "$shown" ] && [ "$shown" -ge "$level" ] && exit 0

@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # Proves newleaf works end to end with real Claude Code, in a throwaway git repo:
 #   1 the guard speaks at twice a chat's start and stays silent below it
-#   2 the start hook puts a marker note and the rules before the model (one small Haiku call)
+#   2 a brand-new session gets the rules and one line about the note, not the note;
+#     asked to continue, it reads the note (small Haiku calls)
 #   3 /newleaf writes the note in one reply; the Stop hook saves it, hidden from git
+#   4 the same outside a git repo
+# tests/two_sessions.py covers /clear and sessions side by side.
 # Usage: bash tests/smoke.sh [plugin dir to test instead of the installed plugin]
 # NEWLEAF_SMOKE_MODEL picks the model for step 3 (default: your default model).
 set -uo pipefail
@@ -31,13 +34,20 @@ case $(guard smoke-a) in *systemMessage*) pass "1a guard speaks at 2x a chat's s
 { call 50000; call 90000; } > "$tmp/t.jsonl"
 if [ -z "$(guard smoke-b)" ]; then pass "1b guard silent below 2x"; else fail "1b guard spoke below 2x"; fi
 
-# 2 start hook: a note with a random marker reaches the model, with the rules
+# 2 start hook: a brand-new session hears of the note (with a random marker) but does not get it
 marker="MARK-$RANDOM$RANDOM"
 mkdir -p "$repo/.newleaf"
 printf -- '---\nwritten: smoke\nbranch: none\nhead: none\n---\n## Next\n%s\n' "$marker" > "$repo/.newleaf/handoff.md"
-reply=$(cd "$repo" && printf '%s' "Reply with two words: the word after '## Next' in the handoff note in your context (NONE if there is no note), then YES or NO for whether you see 'Lean working rules'." \
+reply=$(cd "$repo" && printf '%s' "Use no tools. Reply with three words: YES or NO for whether you see 'Lean working rules'; YES or NO for whether you are told of a handoff note at .newleaf/handoff.md; then the text of the note's '## Next' section if it is in your context, else NONE." \
   | MSYS_NO_PATHCONV=1 claude -p --model haiku "${extra[@]}" --no-session-persistence 2>/dev/null)
-case $reply in *"$marker"*YES*) pass "2 start hook: the note and the rules reached the model" ;; *) fail "2 start hook (reply: $reply)" ;; esac
+case $reply in
+  *"$marker"*) fail "2a a new session got the note itself (reply: $reply)" ;;
+  *YES*YES*NONE*) pass "2a a new session: the rules and one line about the note, not the note" ;;
+  *) fail "2a start hook (reply: $reply)" ;;
+esac
+reply=$(cd "$repo" && printf '%s' "Continue the work from the handoff note: read it and reply with only the text of its '## Next' section." \
+  | MSYS_NO_PATHCONV=1 claude -p --model haiku --allowedTools Read "${extra[@]}" --no-session-persistence 2>/dev/null)
+case $reply in *"$marker"*) pass "2b asked to continue, it reads the note" ;; *) fail "2b did not read the note (reply: ${reply:0:200})" ;; esac
 rm -rf "$repo/.newleaf"
 
 # 3 /newleaf: one reply with the note, saved by the Stop hook

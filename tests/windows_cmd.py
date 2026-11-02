@@ -35,7 +35,7 @@ def main():
         proj, home, data = (os.path.join(tmp, d) for d in ('proj', 'home', 'data'))
         for d in (os.path.join(proj, '.newleaf'), os.path.join(home, '.claude'), data):
             os.makedirs(d)
-        env = {k: v for k, v in os.environ.items() if k != 'CLAUDE_PROJECT_DIR'}
+        env = {k: v for k, v in os.environ.items() if k not in ('CLAUDE_PROJECT_DIR', 'CLAUDE_PID')}
         env.update(CLAUDE_PLUGIN_ROOT=ROOT, CLAUDE_PLUGIN_DATA=data, HOME=home, USERPROFILE=home)
 
         def run(event, payload):
@@ -45,17 +45,22 @@ def main():
             return r.returncode, r.stdout
 
         note = '---\nwritten: now\nbranch: none\nhead: none\n---\n## Next\nship é 🍃\n'
-        with open(os.path.join(proj, '.newleaf', 'handoff.md'), 'w', encoding='utf-8', newline='\n') as f:
-            f.write(note)
-        code, out = run('SessionStart', {'cwd': proj, 'source': 'startup', 'hook_event_name': 'SessionStart'})
+        os.makedirs(os.path.join(proj, '.newleaf', 'notes'))
+        for name in ('handoff.md', os.path.join('notes', 'w0.md')):
+            with open(os.path.join(proj, '.newleaf', name), 'w', encoding='utf-8', newline='\n') as f:
+                f.write(note)
+        code, out = run('SessionStart', {'cwd': proj, 'source': 'startup', 'session_id': 'w9', 'hook_event_name': 'SessionStart'})
         check('SessionStart: exit 0', code == 0)
-        check('SessionStart: the rules and the note, bytes intact', b'Lean working rules' in out and 'ship é 🍃'.encode('utf-8') in out)
+        check('SessionStart, a new session: the rules and one line about the note', b'Lean working rules' in out and b'earlier session' in out and b'ship' not in out)
+        code, out = run('SessionStart', {'cwd': proj, 'source': 'compact', 'session_id': 'w0', 'hook_event_name': 'SessionStart'})
+        check('SessionStart, a compaction: its own note, bytes intact', code == 0 and 'ship é 🍃'.encode('utf-8') in out)
 
         reply = 'Done.\n<newleaf-note>\n---\nwritten: now\nbranch: none\nhead: none\n---\n## Next\nsaved é 🍃\n</newleaf-note>\n'
-        code, out = run('Stop', {'cwd': proj, 'hook_event_name': 'Stop', 'last_assistant_message': reply, 'stop_hook_active': False})
+        code, out = run('Stop', {'cwd': proj, 'session_id': 'w1', 'hook_event_name': 'Stop', 'last_assistant_message': reply, 'stop_hook_active': False})
         check('Stop: exit 0 and JSON out', code == 0 and json.loads(out.decode('utf-8')).get('systemMessage', '').startswith('newleaf: note saved'))
-        with open(os.path.join(proj, '.newleaf', 'handoff.md'), encoding='utf-8') as f:
-            check('Stop: the note saved, bytes intact', 'saved é 🍃' in f.read())
+        for name in ('handoff.md', os.path.join('notes', 'w1.md')):
+            with open(os.path.join(proj, '.newleaf', name), encoding='utf-8') as f:
+                check('Stop: saved as ' + name.replace(os.sep, '/') + ', bytes intact', 'saved é 🍃' in f.read())
 
         tr = os.path.join(tmp, 'rollout.jsonl')
 

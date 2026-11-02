@@ -67,6 +67,9 @@ project_dir() {
   unix_path "${dir:-$PWD}"
 }
 
+# session_id JSON: this session's id, safe as a file name
+session_id() { printf '%s' "$1" | json_str session_id | tr -cd 'A-Za-z0-9-'; }
+
 # config KEY PROJECT: a setting from <project>/.newleaf/config.json, else ~/.claude/newleaf.json
 config() {
   local f v
