@@ -280,7 +280,10 @@ def main():
     next_section = "Use no tools. Reply with the full text of the '## Next' section of the handoff note in your context. If no handoff note's text is in your context, reply NONE."
     mark_a, mark_b = 'MARKA' + secrets.token_hex(3), 'MARKB' + secrets.token_hex(3)
     try:
-        a = open_session('A', ['--allowedTools', 'Bash(sleep:*)'])
+        # a script, not a bare sleep: Claude Code steers models away from a foreground sleep
+        with open(os.path.join(folder, 'slow.sh'), 'w', newline='') as f:
+            f.write('sleep 30' + chr(10) + 'echo SLOW-DONE' + chr(10))
+        a = open_session('A', ['--allowedTools', 'Bash(bash slow.sh)'])
         b = open_session('B')
         check('A and B start side by side in one folder', a.term.alive() and b.term.alive(), a.screen() + ' / ' + b.screen())
         check("A's /newleaf saves A's note", save_note(a, mark_a), a.screen())
@@ -313,13 +316,13 @@ def main():
 
         # opening a session while another is mid-command
         tag = 'Q' + secrets.token_hex(4)
-        a.send(f'{tag}: Run this one bash command and wait for it: sleep 30 . Then reply with only the word FINISHED.')
+        a.send(f'{tag}: Run exactly this one bash command in the foreground and wait for it: bash slow.sh . Then reply with only the word it printed.')
         time.sleep(6)
         d = open_session('D')
         r = ask(d, 'Reply with only the word READY.')
         check('a new session opens and answers while A is mid-command', 'READY' in r, r)
         r = reply_after(a, tag)
-        check('A finishes its command, untouched', 'FINISHED' in r and a.term.alive(), r)
+        check('A finishes its command, untouched', 'SLOW-DONE' in r and a.term.alive(), r)
         check('every session is still alive', all(s.term.alive() for s in sessions), ','.join(s.name for s in sessions if not s.term.alive()))
     finally:
         for s in sessions:
