@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 (2026-11-02)
+
+Sessions side by side in one folder no longer get each other's notes.
+
+- Each session saves its own note in `.newleaf/notes/`; `.newleaf/handoff.md` stays the folder's latest. Before, one session's `/newleaf` overwrote another's, and its note then loaded into the other session's `/clear` and compaction.
+- `/clear` loads the note its own process saved, and compaction only that session's own. Claude Code keeps `CLAUDE_PID` across `/clear`, so no new hook was needed.
+- A brand-new session gets the rules and one line pointing at the latest note, read only if you ask to continue that work. It is no longer told to build on what may be another session's other work. Tools without `CLAUDE_PID`, Codex among them, get that same line after `/clear`.
+- `/newleaf` then `/clear` gives the model the same bytes as before, so the measured savings stand; `tests/hooks.sh` holds it there. Closing the window and continuing in a new session costs one extra small step to read the note.
+- `tests/two_sessions.py`: real interactive sessions side by side in real terminals (Windows, Linux, macOS), including opening a session while another is mid-command.
+
 ## 1.1.2 (2026-11-02)
 
 - `/newleaf` works outside a git repository (a home folder, say). Its `git log` fact had no fallback, so it failed there and Claude Code stopped the skill with "Shell command failed". Every fact command now ends cleanly anywhere; `tests/hooks.sh` runs each one inside and outside a repo, and `tests/smoke.sh` saves a real note outside one.

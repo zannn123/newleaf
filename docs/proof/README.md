@@ -15,7 +15,7 @@ same prompt, same model (`claude-opus-5-5`), headless `claude -p` runs on
 | --- | --- |
 | resumed session | A real session resumed at the moment its owner paused work (440k tokens of history), then given the task. This is the habit newleaf replaces. |
 | fresh session, no plugin | A new session, nothing installed. |
-| fresh + newleaf | A new session with newleaf: the lean working rules and a handoff note written by `/newleaf` from that same paused session. |
+| fresh + newleaf | A new session with newleaf: the lean working rules and a handoff note written by `/newleaf` from that same paused session. Since 1.2.0 that is what `/newleaf` then `/clear` gives, byte for byte. |
 | handoff with /newleaf | The paused session, given `/newleaf`: what one handoff costs. |
 | prototype rows | Earlier versions measured on the way (a 4-step handoff, the note without rules). Kept for completeness. |
 

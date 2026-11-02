@@ -82,8 +82,8 @@
   <table>
     <tr><th style="width:24%">Piece</th><th>What it does</th></tr>
     <tr><td><code>/newleaf</code></td><td>One reply writes the note. The branch, commit, changed files and recent commits are gathered before the model reads the skill, so the note costs a single call.</td></tr>
-    <tr><td>Stop hook</td><td>Takes the note from the reply and saves it to <code>.newleaf/handoff.md</code>, keeps the old one as <code>handoff.prev.md</code>, and adds a <code>.gitignore</code> so the folder never reaches git.</td></tr>
-    <tr><td>Start hook</td><td>On every new session, <code>/clear</code> and compaction, loads the lean working rules and the note, and says if the branch or commit moved on since the note.</td></tr>
+    <tr><td>Stop hook</td><td>Takes the note from the reply and saves it as this session's own in <code>.newleaf/notes/</code> and as the folder's latest, <code>.newleaf/handoff.md</code>, and adds a <code>.gitignore</code> so the folder never reaches git.</td></tr>
+    <tr><td>Start hook</td><td>Loads the lean working rules into every session. <code>/clear</code> and compaction also get that session's own note, and hear if the branch or commit moved on. A brand-new session gets one line pointing at the latest note.</td></tr>
     <tr><td>Guard</td><td>Before each prompt, compares what a step re-sends now with the chat's first step. At 2× it says so, again at 4× and 8×. A handoff costs one call, so past 2× it pays back within the next request.</td></tr>
   </table>
   <h3>A note looks like this</h3>
@@ -163,7 +163,7 @@ claude plugin marketplace remove newleaf</pre>
       <h3>Does it work with caveman?</h3>
       <p>Yes, they add up. caveman shortens replies, about 0.3% of tokens; newleaf cuts the re-sent conversation, about 99%.</p>
       <h3>Where is my note?</h3>
-      <p><code>.newleaf/handoff.md</code> in the project, the previous one in <code>handoff.prev.md</code>. Git ignores the folder on its own.</p>
+      <p>The latest is <code>.newleaf/handoff.md</code> in the project, each session's own in <code>.newleaf/notes/</code>, so sessions side by side keep their notes apart. Git ignores the folder on its own.</p>
       <h3>Will a fresh session forget my rules?</h3>
       <p>Not the ones in the note: "Rules in play" carries them in your words, and the start hook loads the note before your first prompt.</p>
       <h3>Is anything sent anywhere?</h3>
@@ -179,7 +179,7 @@ claude plugin marketplace remove newleaf</pre>
       <h3>Where was it tested?</h3>
       <p>Windows 11 (Git Bash), Ubuntu, Debian (mawk), Alpine (busybox awk) and macOS (CI).</p>
       <h3>Does it work with Codex?</h3>
-      <p>Experimental: <code>codex plugin marketplace add zannn123/newleaf</code>, <code>codex plugin add newleaf@newleaf</code>, trust its hooks with <code>/hooks</code>, then <code>$newleaf</code> and <code>/new</code>. Built from Codex's docs and source; not yet measured in a live Codex session.</p>
+      <p>Experimental: <code>codex plugin marketplace add zannn123/newleaf</code>, <code>codex plugin add newleaf@newleaf</code>, trust its hooks with <code>/hooks</code>, then <code>$newleaf</code>, <code>/new</code>, and "continue from the note". Built from Codex's docs and source; not yet measured in a live Codex session.</p>
     </div>
   </div>
   <div class="foot"><span>newleaf guide · github.com/zannn123/newleaf</span><span>6</span></div>

@@ -1,7 +1,7 @@
 {
   "name": "newleaf",
   "description": "Turn over a new leaf: start Claude Code sessions fresh without losing the thread. A one-call handoff note, loaded into the next session automatically, and a guard that tells you when a chat has grown costly.",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "author": {
     "name": "DjMhel"
   },

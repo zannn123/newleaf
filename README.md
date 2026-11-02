@@ -79,7 +79,8 @@ codex plugin add newleaf@newleaf
 
 Or add it in the Codex desktop app. Then run `/hooks` once to trust newleaf's
 hooks (Codex asks this for every plugin hook), start a new session, and use
-**`$newleaf`**, then **`/new`**.
+**`$newleaf`**, then **`/new`**, then say "continue from the note" (Codex's
+`/new` starts a new session, so it hears of the note and reads it when asked).
 
 Status: built from Codex's official docs and its source code; the hook scripts
 are the ones tested above, plus tests against Codex's log format. It has not
@@ -91,6 +92,8 @@ yet been measured in a live Codex session, and Codex on Windows is untested.
 2. When a round of work ends, or newleaf says the chat has grown, type **`/newleaf`**.
 3. Type **`/clear`**. The fresh session starts with your note and the lean working rules.
 
+Closed the window instead? Start a new session and say **"continue from the note"**: it reads the latest note, at the cost of one extra small step.
+
 <p align="center"><img src="docs/assets/flow.svg" alt="The newleaf loop: work, /newleaf writes the note in one reply, /clear, a fresh session starts with the note." width="100%"></p>
 
 ## How it works
@@ -98,8 +101,8 @@ yet been measured in a live Codex session, and Codex on Windows is untested.
 | Piece | What it does |
 | --- | --- |
 | `/newleaf` | One reply writes the handoff note: rules in play, decisions and why, state, the next step, open questions. Git facts are gathered before the model reads the skill, so it costs **one call**. |
-| Stop hook | Saves the note to `.newleaf/handoff.md` (the old one becomes `handoff.prev.md`). The folder hides itself from git. |
-| Start hook | Loads the lean working rules and the note into every new session, `/clear` and compaction, and says if the repo moved on since the note. |
+| Stop hook | Saves the note as this session's own, in `.newleaf/notes/`, and as the folder's latest, `.newleaf/handoff.md` (the old latest becomes `handoff.prev.md`). The folder hides itself from git. |
+| Start hook | Loads the lean working rules into every session. `/clear` and compaction also get that session's own note, and hear if the repo moved on since it. A brand-new session gets one line pointing at the latest note, which it reads only if you ask to continue that work. |
 | Guard | Says so when a step re-sends **twice** what the chat started with, then again at 4× and 8×. A handoff costs one call, so past 2× it pays for itself within your next request. |
 
 Three short bash scripts you can read in a minute: [`hooks/`](hooks). No
@@ -125,6 +128,9 @@ the feature's folder.
 - **86% fewer tokens per task.**
 - **79% fewer** on the first task even counting the handoff; **85%** over five tasks.
 
+Those runs started with the rules and the note in context, which since 1.2.0 is
+what `/newleaf` then `/clear` gives, byte for byte (a test holds it there).
+
 Method, data and how to re-draw the charts: [`docs/proof`](docs/proof). Your
 numbers will differ with your project and habits; measure your own with
 `python tools/measure.py --days 7` (optional, needs Python).
@@ -144,8 +150,15 @@ Optional. `~/.claude/newleaf.json` for your machine, or
 **Does it work with caveman?** Yes, they add up. caveman shortens replies,
 about 0.3% of tokens; newleaf cuts the re-sent conversation, about 99%.
 
-**Where is my note?** `.newleaf/handoff.md` in your project, the previous one
-in `handoff.prev.md`. git ignores the folder on its own.
+**Can I run several sessions in one folder?** Yes. Each session keeps its own
+note, so `/clear` and compaction only ever bring back that session's note, and a
+new session on other work is not told to carry on someone else's.
+[`tests/two_sessions.py`](tests/two_sessions.py) proves it with real sessions side
+by side.
+
+**Where is my note?** The latest is `.newleaf/handoff.md` in your project, the one
+before it `handoff.prev.md`, and each session's own in `.newleaf/notes/` (the
+newest 40 files are kept). git ignores the folder on its own.
 
 **Does it run on my machine?** Tested on Windows 11 (Git Bash), Ubuntu, Debian
 (mawk), Alpine (busybox awk) and macOS (CI): [`tests/hooks.sh`](tests/hooks.sh)
